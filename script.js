@@ -1,6 +1,6 @@
 ﻿const BOARD_WIDTH = 10;
 const BOARD_HEIGHT = 20;
-const CELL_SIZE = 30;
+const CELL_SIZE = 36;
 
 const PREVIEW_SIZE = 120;
 const PREVIEW_CELL = 24;
