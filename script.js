@@ -118,6 +118,7 @@ const gameState = {
   currentPiece: null,
   nextQueue: [],
   holdPieceType: null,
+  canHold: true,
   score: 0,
   level: 1,
   lines: 0,
@@ -611,6 +612,7 @@ function setGameOver() {
 
 function spawnNewPiece(type = takeNextType()) {
   gameState.currentPiece = createPiece(type);
+  gameState.canHold = true;
 
   if (collides(gameState.currentPiece, gameState.board)) {
     setGameOver();
@@ -667,49 +669,26 @@ function hardDrop() {
 }
 
 function holdPiece() {
-  if (gameState.isPaused || gameState.isGameOver || !gameState.currentPiece) {
+  if (!gameState.canHold || gameState.isPaused || gameState.isGameOver) {
     return;
   }
 
-  const currentPiece = gameState.currentPiece;
-  const currentType = currentPiece.type;
-  const oldHoldType = gameState.holdPieceType;
+  const currentType = gameState.currentPiece.type;
 
-  // 入れ替え後も「今のピース位置」で出す。
-  const nextType = oldHoldType === null ? takeNextType() : oldHoldType;
-  const swappedPiece = createPiece(nextType);
-  swappedPiece.x = currentPiece.x;
-  swappedPiece.y = currentPiece.y;
-
-  if (!collides(swappedPiece, gameState.board)) {
+  if (gameState.holdPieceType === null) {
     gameState.holdPieceType = currentType;
-    gameState.currentPiece = swappedPiece;
-    return;
+    gameState.currentPiece = createPiece(takeNextType());
+  } else {
+    const swappedType = gameState.holdPieceType;
+    gameState.holdPieceType = currentType;
+    gameState.currentPiece = createPiece(swappedType);
   }
 
-  // 位置固定で入らない場合は少しだけ横/上方向に救済して不正重なりを防ぐ。
-  const fallbackOffsets = [
-    [0, -1],
-    [-1, 0],
-    [1, 0],
-    [-2, 0],
-    [2, 0],
-    [0, -2],
-  ];
+  gameState.canHold = false;
 
-  for (const [dx, dy] of fallbackOffsets) {
-    if (!collides(swappedPiece, gameState.board, dx, dy)) {
-      swappedPiece.x += dx;
-      swappedPiece.y += dy;
-      gameState.holdPieceType = currentType;
-      gameState.currentPiece = swappedPiece;
-      return;
-    }
+  if (collides(gameState.currentPiece, gameState.board)) {
+    setGameOver();
   }
-
-  // どうしても置けないときは交換しない（元の状態を維持）。
-  gameState.holdPieceType = oldHoldType;
-  gameState.currentPiece = currentPiece;
 }
 
 function togglePause() {
@@ -732,6 +711,7 @@ function restartGame() {
   gameState.currentPiece = null;
   gameState.nextQueue = [];
   gameState.holdPieceType = null;
+  gameState.canHold = true;
   gameState.score = 0;
   gameState.level = 1;
   gameState.lines = 0;
