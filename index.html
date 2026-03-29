@@ -3,15 +3,35 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tetris</title>
+    <title>Tetris Neon</title>
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <main class="app">
-      <section class="board-section">
-        <h1>TETRIS</h1>
-        <div class="board-wrapper">
-          <canvas id="game-board" width="300" height="600" aria-label="Tetris Board"></canvas>
+    <main class="game-shell">
+      <aside class="left-rail neon-frame">
+        <div class="rail-title">HOLD</div>
+        <canvas id="hold-canvas" width="120" height="120" aria-label="Hold Piece"></canvas>
+        <div class="energy-wrap">
+          <div class="energy-label">ENERGY</div>
+          <div class="energy-bar"></div>
+        </div>
+      </aside>
+
+      <section class="center-stage">
+        <header class="top-hud">
+          <div class="ko-chip">K.O.s</div>
+          <div class="ko-ring">R</div>
+        </header>
+
+        <div class="target-row neon-frame">
+          <button type="button" class="target-btn is-active">Randoms</button>
+          <button type="button" class="target-btn">Attackers</button>
+          <button type="button" class="target-btn">Badges</button>
+          <button type="button" class="target-btn">Targeting</button>
+        </div>
+
+        <div class="board-wrapper neon-frame">
+          <canvas id="game-board" width="360" height="720" aria-label="Tetris Board"></canvas>
           <div id="overlay" class="overlay hidden" aria-live="polite">
             <p id="overlay-title">PAUSED</p>
             <p id="overlay-subtitle">P キーで再開</p>
@@ -19,39 +39,25 @@
         </div>
       </section>
 
-      <aside class="side-panel">
-        <section class="panel stat-panel">
-          <h2>Status</h2>
-          <div class="stat-row"><span>Score</span><strong id="score">0</strong></div>
-          <div class="stat-row"><span>Level</span><strong id="level">1</strong></div>
-          <div class="stat-row"><span>Lines</span><strong id="lines">0</strong></div>
-          <div class="stat-row"><span>Combo</span><strong id="combo">0</strong></div>
-          <div class="stat-row"><span>B2B</span><strong id="b2b">0</strong></div>
-          <div class="stat-row"><span>Last Move</span><strong id="last-move">-</strong></div>
+      <aside class="right-rail neon-frame">
+        <div class="panel-title">NEXT</div>
+        <canvas id="next-canvas" width="120" height="120" aria-label="Next Piece"></canvas>
+
+        <section class="score-panel">
+          <div class="score-row place"><span>PLACE</span><strong>99</strong></div>
+          <div class="score-row"><span>LEVEL</span><strong id="level">1</strong></div>
+          <div class="score-row"><span>SCORE</span><strong id="score">0</strong></div>
+          <div class="score-row"><span>K.O.</span><strong id="b2b">0</strong></div>
+          <div class="score-row"><span>LINES</span><strong id="lines">0</strong></div>
+          <div class="score-row"><span>COMBO</span><strong id="combo">0</strong></div>
+          <div class="score-row last"><span>SKILL</span><strong id="last-move">-</strong></div>
         </section>
 
-        <section class="panel preview-panel">
-          <h2>Next</h2>
-          <canvas id="next-canvas" width="120" height="120" aria-label="Next Piece"></canvas>
-        </section>
-
-        <section class="panel preview-panel">
-          <h2>Hold</h2>
-          <canvas id="hold-canvas" width="120" height="120" aria-label="Hold Piece"></canvas>
-          <p class="hint">C キーでホールド</p>
-        </section>
-
-        <section class="panel controls-panel">
-          <h2>Controls</h2>
-          <ul>
-            <li>← / → : 左右移動</li>
-            <li>↓ : ソフトドロップ</li>
-            <li>↑ : 回転</li>
-            <li>Space : ハードドロップ</li>
-            <li>C : ホールド</li>
-            <li>P : ポーズ</li>
-            <li>R : リスタート</li>
-          </ul>
+        <section class="controls-panel">
+          <p>← → 移動</p>
+          <p>↑ 回転 / ↓ ソフト</p>
+          <p>Space ハード / C Hold</p>
+          <p>P ポーズ / R リスタート</p>
         </section>
       </aside>
     </main>
