@@ -212,12 +212,30 @@ body {
   letter-spacing: 0.03em;
 }
 
-.place strong,
 #score {
   font-size: 2rem;
   line-height: 1;
   color: #fbffff;
   text-shadow: 0 0 14px rgba(111, 236, 255, 0.45);
+}
+
+.score-primary {
+  padding-top: 0;
+  margin-bottom: 4px;
+}
+
+.score-primary span {
+  color: #d7f7ff;
+  font-size: 0.78rem;
+}
+
+.score-primary #score {
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: #ffffff;
+  text-shadow:
+    0 0 16px rgba(111, 236, 255, 0.72),
+    0 0 28px rgba(111, 236, 255, 0.3);
 }
 
 #lines,
@@ -250,6 +268,40 @@ body {
 
 .controls-panel p:last-child {
   margin-bottom: 0;
+}
+
+.touch-controls {
+  display: none;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 8px;
+  touch-action: none;
+}
+
+.touch-btn {
+  border: 1px solid rgba(122, 220, 255, 0.7);
+  border-radius: 10px;
+  background: rgba(5, 26, 44, 0.92);
+  color: #e6fbff;
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 0.04em;
+  padding: 12px 8px;
+  user-select: none;
+  touch-action: none;
+}
+
+.touch-btn:active,
+.touch-btn.is-pressing {
+  background: rgba(25, 96, 145, 0.95);
+}
+
+.touch-btn-wide {
+  grid-column: span 2;
+}
+
+.touch-btn-soft {
+  font-size: 1.2rem;
 }
 
 .overlay {
@@ -315,5 +367,17 @@ body {
   .energy-wrap,
   .controls-panel {
     margin-top: 0;
+  }
+
+  .controls-panel {
+    display: none;
+  }
+
+  .touch-controls {
+    display: grid;
+  }
+
+  #game-board {
+    touch-action: none;
   }
 }

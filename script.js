@@ -112,6 +112,11 @@ const lastMoveEl = document.getElementById('last-move');
 const overlayEl = document.getElementById('overlay');
 const overlayTitleEl = document.getElementById('overlay-title');
 const overlaySubtitleEl = document.getElementById('overlay-subtitle');
+const touchControlsEl = document.getElementById('touch-controls');
+
+const TOUCH_REPEAT_INITIAL_DELAY_MS = 170;
+const TOUCH_REPEAT_INTERVAL_MS = 65;
+const touchRepeatTimers = {};
 
 const gameState = {
   board: [],
@@ -957,6 +962,106 @@ function updateGame(timestampMs = 0) {
   requestAnimationFrame(updateGame);
 }
 
+function performPlayerAction(action) {
+  if (action === 'restart') {
+    restartGame();
+    return;
+  }
+
+  if (action === 'pause') {
+    togglePause();
+    return;
+  }
+
+  if (gameState.isPaused || gameState.isGameOver) {
+    return;
+  }
+
+  switch (action) {
+    case 'left':
+      movePiece(-1, 0);
+      break;
+    case 'right':
+      movePiece(1, 0);
+      break;
+    case 'down':
+      gameState.isSoftDropping = true;
+      stepDown();
+      break;
+    case 'rotate':
+      rotatePieceClockwise();
+      break;
+    case 'drop':
+      hardDrop();
+      break;
+    case 'hold':
+      holdPiece();
+      break;
+    default:
+      break;
+  }
+}
+
+function stopTouchRepeat(action) {
+  const timers = touchRepeatTimers[action];
+  if (!timers) {
+    return;
+  }
+
+  clearTimeout(timers.timeoutId);
+  clearInterval(timers.intervalId);
+  delete touchRepeatTimers[action];
+}
+
+function startTouchRepeat(action) {
+  if (action !== 'left' && action !== 'right') {
+    return;
+  }
+  stopTouchRepeat(action);
+
+  const timeoutId = setTimeout(() => {
+    const intervalId = setInterval(() => {
+      performPlayerAction(action);
+    }, TOUCH_REPEAT_INTERVAL_MS);
+    touchRepeatTimers[action].intervalId = intervalId;
+  }, TOUCH_REPEAT_INITIAL_DELAY_MS);
+
+  touchRepeatTimers[action] = {
+    timeoutId,
+    intervalId: null,
+  };
+}
+
+function initializeTouchControls() {
+  if (!touchControlsEl) {
+    return;
+  }
+
+  const buttons = touchControlsEl.querySelectorAll('[data-action]');
+  for (const button of buttons) {
+    const action = button.dataset.action;
+
+    button.addEventListener('pointerdown', (event) => {
+      event.preventDefault();
+      button.classList.add('is-pressing');
+      performPlayerAction(action);
+      startTouchRepeat(action);
+    });
+
+    const release = () => {
+      button.classList.remove('is-pressing');
+      stopTouchRepeat(action);
+      if (action === 'down') {
+        gameState.isSoftDropping = false;
+      }
+    };
+
+    button.addEventListener('pointerup', release);
+    button.addEventListener('pointercancel', release);
+    button.addEventListener('pointerleave', release);
+  }
+}
+
 function onKeyDown(event) {
   const key = event.key;
   const code = event.code;
@@ -967,38 +1072,33 @@ function onKeyDown(event) {
   }
 
   if (key === 'r' || key === 'R') {
-    restartGame();
+    performPlayerAction('restart');
     return;
   }
 
   if (key === 'p' || key === 'P') {
-    togglePause();
-    return;
-  }
-
-  if (gameState.isPaused || gameState.isGameOver) {
+    performPlayerAction('pause');
     return;
   }
 
   switch (code) {
     case 'ArrowLeft':
-      movePiece(-1, 0);
+      performPlayerAction('left');
       break;
     case 'ArrowRight':
-      movePiece(1, 0);
+      performPlayerAction('right');
       break;
     case 'ArrowDown':
-      gameState.isSoftDropping = true;
-      stepDown();
+      performPlayerAction('down');
       break;
     case 'ArrowUp':
-      rotatePieceClockwise();
+      performPlayerAction('rotate');
       break;
     case 'Space':
-      hardDrop();
+      performPlayerAction('drop');
       break;
     case 'KeyC':
-      holdPiece();
+      performPlayerAction('hold');
       break;
     default:
       break;
@@ -1022,6 +1122,7 @@ function initializeGame() {
 
   document.addEventListener('keydown', onKeyDown);
   document.addEventListener('keyup', onKeyUp);
+  initializeTouchControls();
 
   restartGame();
   requestAnimationFrame(updateGame);
