@@ -398,3 +398,120 @@ body {
     touch-action: none;
   }
 }
+
+@media (max-width: 700px) {
+  .game-shell {
+    width: 100%;
+    max-width: 420px;
+    grid-template-columns: minmax(0, 1fr) 94px;
+    gap: 8px;
+    align-items: start;
+  }
+
+  .center-stage {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    gap: 6px;
+  }
+
+  .right-rail,
+  .left-rail {
+    width: 94px;
+    min-height: auto;
+    border-radius: 8px;
+    padding: 6px;
+    gap: 6px;
+  }
+
+  .right-rail {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .left-rail {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  .energy-wrap {
+    display: none;
+  }
+
+  .rail-title,
+  .panel-title {
+    font-size: 0.58rem;
+    letter-spacing: 0.12em;
+  }
+
+  #hold-canvas,
+  #next-canvas {
+    max-width: 80px;
+  }
+
+  .score-panel {
+    padding: 5px;
+  }
+
+  .score-row {
+    padding: 2px 0;
+    gap: 4px;
+  }
+
+  .score-row span {
+    font-size: 0.54rem;
+    letter-spacing: 0.04em;
+  }
+
+  .score-row strong {
+    font-size: 0.72rem;
+  }
+
+  .score-primary #score {
+    font-size: 1.3rem;
+    text-shadow: 0 0 9px rgba(111, 236, 255, 0.48);
+  }
+
+  #lines,
+  #combo,
+  #b2b,
+  #last-move {
+    font-size: 0.72rem;
+  }
+
+  #last-move {
+    max-width: 52px;
+  }
+
+  .top-hud {
+    gap: 8px;
+  }
+
+  .ko-chip {
+    font-size: 0.72rem;
+    padding: 2px 8px;
+  }
+
+  .ko-ring {
+    width: 30px;
+    height: 30px;
+    font-size: 1rem;
+  }
+
+  .target-row {
+    padding: 5px;
+    gap: 5px;
+  }
+
+  .target-btn {
+    font-size: 0.62rem;
+    padding: 4px 1px;
+  }
+
+  #game-board {
+    max-width: min(62vw, 248px);
+  }
+
+  .touch-controls {
+    width: min(352px, calc(100% - 14px));
+  }
+}
