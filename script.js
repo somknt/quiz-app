@@ -612,7 +612,7 @@ function setOverlay(visible, title = '', subtitle = '') {
 
 function setGameOver() {
   gameState.isGameOver = true;
-  setOverlay(true, 'GAME OVER', 'R キーでリスタート');
+  setOverlay(true, 'GAME OVER', 'RESTART ボタンまたは R キーでリスタート');
 }
 
 function spawnNewPiece(type = takeNextType()) {

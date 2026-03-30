@@ -304,6 +304,16 @@ body {
   font-size: 1.2rem;
 }
 
+.touch-btn-restart {
+  border-color: rgba(255, 152, 152, 0.85);
+  background: rgba(56, 12, 12, 0.94);
+}
+
+.touch-btn-restart:active,
+.touch-btn-restart.is-pressing {
+  background: rgba(122, 30, 30, 0.95);
+}
+
 .overlay {
   position: absolute;
   inset: 0;
@@ -354,7 +364,7 @@ body {
 
 @media (max-width: 980px) {
   body {
-    padding-bottom: calc(178px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: calc(232px + env(safe-area-inset-bottom, 0px));
   }
 
   .game-shell {
