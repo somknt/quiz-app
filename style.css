@@ -364,26 +364,48 @@ body {
 
 @media (max-width: 980px) {
   body {
-    padding-bottom: calc(232px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: calc(160px + env(safe-area-inset-bottom, 0px));
   }
 
   .game-shell {
-    grid-template-columns: 140px auto 190px;
+    grid-template-columns: 1fr;
     justify-items: center;
     padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
   }
 
   .left-rail,
   .right-rail {
-    width: min(360px, 100%);
-    min-height: auto;
+    display: none;
+  }
+
+  .center-stage {
+    width: 100%;
+    max-width: 100%;
+    gap: 0;
+  }
+
+  .top-hud {
+    display: none;
+  }
+
+  .target-row {
+    display: none;
+  }
+
+  .board-wrapper {
+    width: 100%;
+    max-width: 100%;
+    border-radius: 0;
+  }
+
+  #game-board {
+    width: 100vw;
+    height: 100vh;
+    max-width: 100%;
+    touch-action: none;
   }
 
   .energy-wrap,
-  .controls-panel {
-    margin-top: 0;
-  }
-
   .controls-panel {
     display: none;
   }
@@ -391,23 +413,29 @@ body {
   .touch-controls {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 4px;
-    margin-top: 8px;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    gap: 6px;
+    margin-top: 0;
+    padding: 8px;
     touch-action: none;
-    padding: 4px;
+    background: rgba(2, 12, 24, 0.98);
+    border-top: 1px solid rgba(42, 240, 255, 0.6);
+    border-radius: 0;
+    box-shadow: 0 -4px 16px rgba(42, 240, 255, 0.2);
+    z-index: 30;
   }
 
   .touch-btn {
-    padding: 4px 2px;
-    font-size: 0.65rem;
+    padding: 8px 4px;
+    font-size: 0.75rem;
   }
 
   .touch-btn-wide {
     grid-column: span 1;
-  }
-
-  #game-board {
-    touch-action: none;
   }
 }
 
