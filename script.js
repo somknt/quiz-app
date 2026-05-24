@@ -214,6 +214,21 @@ function collides(piece, board, offsetX = 0, offsetY = 0, candidateMatrix = piec
   return false;
 }
 
+function getGhostPieceY() {
+  if (!gameState.currentPiece) {
+    return -1;
+  }
+
+  const piece = gameState.currentPiece;
+  let offset = 0;
+
+  while (!collides(piece, gameState.board, 0, offset + 1)) {
+    offset += 1;
+  }
+
+  return piece.y + offset;
+}
+
 function rotateMatrixClockwise(matrix) {
   const rows = matrix.length;
   const cols = matrix[0].length;
@@ -798,6 +813,52 @@ function drawCell(ctx, x, y, size, fillColor, isEmpty = false) {
   ctx.strokeRect(innerX + 0.5, innerY + 0.5, innerW - 1, innerH - 1);
 }
 
+function drawGhostPiece() {
+  const piece = gameState.currentPiece;
+  if (!piece) {
+    return;
+  }
+
+  const ghostY = getGhostPieceY();
+
+  piece.matrix.forEach((row, y) => {
+    row.forEach((value, x) => {
+      if (!value) {
+        return;
+      }
+      const drawX = piece.x + x;
+      const drawY = ghostY + y;
+
+      if (drawY >= 0 && drawY < BOARD_HEIGHT) {
+        const px = drawX * CELL_SIZE;
+        const py = drawY * CELL_SIZE;
+        const size = CELL_SIZE;
+        const inset = Math.max(2, Math.floor(size * 0.09));
+        const innerX = px + inset;
+        const innerY = py + inset;
+        const innerW = size - inset * 2;
+        const innerH = size - inset * 2;
+
+        // ゴーストピースを薄い透明で描画
+        boardCtx.fillStyle = 'rgba(255, 255, 255, 0.08)';
+        boardCtx.fillRect(px + 1, py + 1, size - 2, size - 2);
+
+        // メイン本体（透明度0.2）
+        boardCtx.save();
+        boardCtx.globalAlpha = 0.2;
+        boardCtx.fillStyle = piece.color;
+        boardCtx.fillRect(innerX, innerY, innerW, innerH);
+        boardCtx.restore();
+
+        // 枠線
+        boardCtx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+        boardCtx.lineWidth = 1;
+        boardCtx.strokeRect(innerX + 0.5, innerY + 0.5, innerW - 1, innerH - 1);
+      }
+    });
+  });
+}
+
 function drawBoard() {
   boardCtx.clearRect(0, 0, boardCanvas.width, boardCanvas.height);
 
@@ -806,6 +867,9 @@ function drawBoard() {
       drawCell(boardCtx, x, y, CELL_SIZE, cell || '#111922', !cell);
     });
   });
+
+  // ゴーストピースをまず描画（実ピースの後ろに見えるように）
+  drawGhostPiece();
 
   const piece = gameState.currentPiece;
   if (piece) {
