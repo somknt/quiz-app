@@ -273,7 +273,7 @@ body {
 
 .touch-controls {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: 1fr;
   gap: 6px;
   margin-top: 8px;
   touch-action: none;
@@ -286,9 +286,9 @@ body {
   background: rgba(5, 26, 44, 0.92);
   color: #e6fbff;
   font-weight: 700;
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   letter-spacing: 0.04em;
-  padding: 6px 4px;
+  padding: 10px 4px;
   user-select: none;
   touch-action: none;
 }
