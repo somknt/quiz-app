@@ -1121,7 +1121,9 @@ function handleSwipe() {
     }
   } else {
     if (deltaY > 0) {
-      performPlayerAction('down');
+      if (!gameState.isPaused && !gameState.isGameOver) {
+        hardDrop();
+      }
     } else {
       performPlayerAction('rotate');
     }
