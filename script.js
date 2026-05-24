@@ -126,6 +126,8 @@ const touchState = {
   endX: 0,
   endY: 0,
   touchStartTime: 0,
+  isMovingDown: false,
+  downMoveTimer: null,
 };
 
 const gameState = {
@@ -1124,9 +1126,7 @@ function handleSwipe() {
     }
   } else {
     if (deltaY > 0) {
-      if (!gameState.isPaused && !gameState.isGameOver) {
-        hardDrop();
-      }
+      // 下スワイプ - この時点では何もしない（touchmoveで処理済み）
     } else {
       performPlayerAction('rotate');
     }
@@ -1169,20 +1169,54 @@ function initializeTouchControls() {
       touchState.endX = event.touches[0].clientX;
       touchState.endY = event.touches[0].clientY;
       touchState.touchStartTime = Date.now();
+      touchState.isMovingDown = false;
+    }
+  }, { passive: true });
+
+  boardCanvas.addEventListener('touchmove', (event) => {
+    if (event.touches.length === 1) {
+      touchState.endX = event.touches[0].clientX;
+      touchState.endY = event.touches[0].clientY;
+
+      const deltaY = touchState.endY - touchState.startY;
+
+      if (deltaY > 20 && !touchState.isMovingDown) {
+        touchState.isMovingDown = true;
+        if (touchState.downMoveTimer) {
+          clearInterval(touchState.downMoveTimer);
+        }
+        touchState.downMoveTimer = setInterval(() => {
+          if (!gameState.isPaused && !gameState.isGameOver) {
+            stepDown();
+          }
+        }, 60);
+      } else if (deltaY <= 20 && touchState.isMovingDown) {
+        touchState.isMovingDown = false;
+        if (touchState.downMoveTimer) {
+          clearInterval(touchState.downMoveTimer);
+          touchState.downMoveTimer = null;
+        }
+      }
     }
   }, { passive: true });
 
   boardCanvas.addEventListener('touchend', (event) => {
+    touchState.isMovingDown = false;
+    if (touchState.downMoveTimer) {
+      clearInterval(touchState.downMoveTimer);
+      touchState.downMoveTimer = null;
+    }
+
     if (event.changedTouches.length === 1) {
       touchState.endX = event.changedTouches[0].clientX;
       touchState.endY = event.changedTouches[0].clientY;
-      
+
       const duration = Date.now() - touchState.touchStartTime;
       const distance = Math.sqrt(
         Math.pow(touchState.endX - touchState.startX, 2) +
         Math.pow(touchState.endY - touchState.startY, 2)
       );
-      
+
       if (duration < SWIPE_MAX_DURATION_MS && distance < 20) {
         if (!gameState.isPaused && !gameState.isGameOver) {
           rotatePieceClockwise();
