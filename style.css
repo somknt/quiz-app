@@ -371,32 +371,37 @@ body {
     grid-template-columns: 1fr;
     justify-items: center;
     padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+    display: contents;
   }
 
   .left-rail,
   .right-rail {
-    width: min(360px, 100%);
-    min-height: auto;
+    display: none;
   }
 
-  .energy-wrap,
-  .controls-panel {
-    margin-top: 0;
+  .center-stage {
+    display: contents;
   }
 
-  .controls-panel {
+  .top-hud {
+    display: none;
+  }
+
+  .target-row {
     display: none;
   }
 
   .touch-controls {
     display: grid;
+    grid-template-columns: repeat(3, 1fr);
     position: fixed;
     left: 50%;
     bottom: calc(10px + env(safe-area-inset-bottom, 0px));
     transform: translateX(-50%);
-    width: min(360px, calc(100% - 16px));
+    width: min(280px, calc(100% - 16px));
     margin-top: 0;
-    padding: 8px;
+    padding: 6px;
+    gap: 4px;
     border: 1px solid rgba(42, 240, 255, 0.6);
     border-radius: 12px;
     background: rgba(2, 12, 24, 0.94);
@@ -404,8 +409,30 @@ body {
     z-index: 30;
   }
 
+  .touch-btn {
+    padding: 6px 4px;
+    font-size: 0.7rem;
+  }
+
+  .touch-btn-wide {
+    grid-column: span 1;
+  }
+
   #game-board {
     touch-action: none;
+    max-width: 100%;
+    width: 100vw;
+    height: 100vh;
+  }
+
+  .board-wrapper {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    top: 0;
+    left: 0;
+    z-index: 10;
   }
 }
 
