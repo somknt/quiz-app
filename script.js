@@ -119,9 +119,12 @@ const TOUCH_REPEAT_INTERVAL_MS = 65;
 const touchRepeatTimers = {};
 
 const SWIPE_MIN_DISTANCE = 30;
+const SWIPE_MAX_DURATION_MS = 300;
 const touchState = {
   startX: 0,
   startY: 0,
+  endX: 0,
+  endY: 0,
   touchStartTime: 0,
 };
 
@@ -1163,6 +1166,8 @@ function initializeTouchControls() {
     if (event.touches.length === 1) {
       touchState.startX = event.touches[0].clientX;
       touchState.startY = event.touches[0].clientY;
+      touchState.endX = event.touches[0].clientX;
+      touchState.endY = event.touches[0].clientY;
       touchState.touchStartTime = Date.now();
     }
   }, { passive: true });
@@ -1171,7 +1176,20 @@ function initializeTouchControls() {
     if (event.changedTouches.length === 1) {
       touchState.endX = event.changedTouches[0].clientX;
       touchState.endY = event.changedTouches[0].clientY;
-      handleSwipe();
+      
+      const duration = Date.now() - touchState.touchStartTime;
+      const distance = Math.sqrt(
+        Math.pow(touchState.endX - touchState.startX, 2) +
+        Math.pow(touchState.endY - touchState.startY, 2)
+      );
+      
+      if (duration < SWIPE_MAX_DURATION_MS && distance < 20) {
+        if (!gameState.isPaused && !gameState.isGameOver) {
+          rotatePieceClockwise();
+        }
+      } else {
+        handleSwipe();
+      }
     }
   }, { passive: true });
 }
