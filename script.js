@@ -128,6 +128,7 @@ const touchState = {
   touchStartTime: 0,
   isMovingDown: false,
   downMoveTimer: null,
+  movedDownDuringTouch: false,
 };
 
 const gameState = {
@@ -1126,7 +1127,10 @@ function handleSwipe() {
     }
   } else {
     if (deltaY > 0) {
-      // 下スワイプ - この時点では何もしない（touchmoveで処理済み）
+      // 下スワイプ - 加速中でなかった場合のみハードドロップ
+      if (!touchState.movedDownDuringTouch && !gameState.isPaused && !gameState.isGameOver) {
+        hardDrop();
+      }
     } else {
       performPlayerAction('rotate');
     }
@@ -1170,6 +1174,7 @@ function initializeTouchControls() {
       touchState.endY = event.touches[0].clientY;
       touchState.touchStartTime = Date.now();
       touchState.isMovingDown = false;
+      touchState.movedDownDuringTouch = false;
     }
   }, { passive: true });
 
@@ -1182,6 +1187,7 @@ function initializeTouchControls() {
 
       if (deltaY > 20 && !touchState.isMovingDown) {
         touchState.isMovingDown = true;
+        touchState.movedDownDuringTouch = true;
         if (touchState.downMoveTimer) {
           clearInterval(touchState.downMoveTimer);
         }
