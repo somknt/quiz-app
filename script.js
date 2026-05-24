@@ -118,6 +118,13 @@ const TOUCH_REPEAT_INITIAL_DELAY_MS = 170;
 const TOUCH_REPEAT_INTERVAL_MS = 65;
 const touchRepeatTimers = {};
 
+const SWIPE_MIN_DISTANCE = 30;
+const touchState = {
+  startX: 0,
+  startY: 0,
+  touchStartTime: 0,
+};
+
 const gameState = {
   board: [],
   currentPiece: null,
@@ -1096,6 +1103,31 @@ function startTouchRepeat(action) {
   };
 }
 
+function handleSwipe() {
+  const deltaX = touchState.endX - touchState.startX;
+  const deltaY = touchState.endY - touchState.startY;
+  const absDeltaX = Math.abs(deltaX);
+  const absDeltaY = Math.abs(deltaY);
+
+  if (Math.max(absDeltaX, absDeltaY) < SWIPE_MIN_DISTANCE) {
+    return;
+  }
+
+  if (absDeltaX > absDeltaY) {
+    if (deltaX > 0) {
+      performPlayerAction('right');
+    } else {
+      performPlayerAction('left');
+    }
+  } else {
+    if (deltaY > 0) {
+      performPlayerAction('down');
+    } else {
+      performPlayerAction('rotate');
+    }
+  }
+}
+
 function initializeTouchControls() {
   if (!touchControlsEl) {
     return;
@@ -1124,6 +1156,22 @@ function initializeTouchControls() {
     button.addEventListener('pointercancel', release);
     button.addEventListener('pointerleave', release);
   }
+
+  boardCanvas.addEventListener('touchstart', (event) => {
+    if (event.touches.length === 1) {
+      touchState.startX = event.touches[0].clientX;
+      touchState.startY = event.touches[0].clientY;
+      touchState.touchStartTime = Date.now();
+    }
+  }, { passive: true });
+
+  boardCanvas.addEventListener('touchend', (event) => {
+    if (event.changedTouches.length === 1) {
+      touchState.endX = event.changedTouches[0].clientX;
+      touchState.endY = event.changedTouches[0].clientY;
+      handleSwipe();
+    }
+  }, { passive: true });
 }
 
 function onKeyDown(event) {
