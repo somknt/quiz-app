@@ -119,7 +119,7 @@ const TOUCH_REPEAT_INTERVAL_MS = 65;
 const touchRepeatTimers = {};
 
 const SWIPE_MIN_DISTANCE = 30;
-const SWIPE_HORIZONTAL_MIN_DISTANCE = 15;
+const SWIPE_HORIZONTAL_MIN_DISTANCE = 8;
 const SWIPE_MAX_DURATION_MS = 300;
 const LONG_PRESS_DELAY_MS = 200;
 const touchState = {
