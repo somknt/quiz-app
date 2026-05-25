@@ -121,12 +121,16 @@ const touchRepeatTimers = {};
 const SWIPE_MIN_DISTANCE = 30;
 const SWIPE_HORIZONTAL_MIN_DISTANCE = 15;
 const SWIPE_MAX_DURATION_MS = 300;
+const LONG_PRESS_DELAY_MS = 200;
 const touchState = {
   startX: 0,
   startY: 0,
   endX: 0,
   endY: 0,
   touchStartTime: 0,
+  longPressTimer: null,
+  accelerationTimer: null,
+  isLongPressing: false,
 };
 
 const gameState = {
@@ -1176,10 +1180,59 @@ function initializeTouchControls() {
       touchState.endX = event.touches[0].clientX;
       touchState.endY = event.touches[0].clientY;
       touchState.touchStartTime = Date.now();
+      touchState.isLongPressing = false;
+
+      // 長押しタイマーセット
+      touchState.longPressTimer = setTimeout(() => {
+        if (!gameState.isPaused && !gameState.isGameOver) {
+          touchState.isLongPressing = true;
+          // 加速を開始
+          touchState.accelerationTimer = setInterval(() => {
+            if (!gameState.isPaused && !gameState.isGameOver) {
+              stepDown();
+            }
+          }, 60);
+        }
+      }, LONG_PRESS_DELAY_MS);
+    }
+  }, { passive: true });
+
+  boardCanvas.addEventListener('touchmove', (event) => {
+    if (event.touches.length === 1) {
+      touchState.endX = event.touches[0].clientX;
+      touchState.endY = event.touches[0].clientY;
+
+      const deltaX = touchState.endX - touchState.startX;
+      const deltaY = touchState.endY - touchState.startY;
+      const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+
+      // 移動があった場合は長押しをキャンセル
+      if (distance > 10) {
+        if (touchState.longPressTimer) {
+          clearTimeout(touchState.longPressTimer);
+          touchState.longPressTimer = null;
+        }
+        if (touchState.accelerationTimer) {
+          clearInterval(touchState.accelerationTimer);
+          touchState.accelerationTimer = null;
+        }
+        touchState.isLongPressing = false;
+      }
     }
   }, { passive: true });
 
   boardCanvas.addEventListener('touchend', (event) => {
+    // 加速を停止
+    if (touchState.accelerationTimer) {
+      clearInterval(touchState.accelerationTimer);
+      touchState.accelerationTimer = null;
+    }
+    if (touchState.longPressTimer) {
+      clearTimeout(touchState.longPressTimer);
+      touchState.longPressTimer = null;
+    }
+    touchState.isLongPressing = false;
+
     if (event.changedTouches.length === 1) {
       touchState.endX = event.changedTouches[0].clientX;
       touchState.endY = event.changedTouches[0].clientY;
