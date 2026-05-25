@@ -273,7 +273,7 @@ body {
 
 .touch-controls {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: 1fr;
   gap: 6px;
   margin-top: 8px;
   touch-action: none;

@@ -119,6 +119,7 @@ const TOUCH_REPEAT_INTERVAL_MS = 65;
 const touchRepeatTimers = {};
 
 const SWIPE_MIN_DISTANCE = 30;
+const SWIPE_HORIZONTAL_MIN_DISTANCE = 15;
 const SWIPE_MAX_DURATION_MS = 300;
 const touchState = {
   startX: 0,
@@ -126,9 +127,6 @@ const touchState = {
   endX: 0,
   endY: 0,
   touchStartTime: 0,
-  isMovingDown: false,
-  downMoveTimer: null,
-  movedDownDuringTouch: false,
 };
 
 const gameState = {
@@ -1115,20 +1113,25 @@ function handleSwipe() {
   const absDeltaX = Math.abs(deltaX);
   const absDeltaY = Math.abs(deltaY);
 
-  if (Math.max(absDeltaX, absDeltaY) < SWIPE_MIN_DISTANCE) {
-    return;
-  }
-
-  if (absDeltaX > absDeltaY) {
+  // 左右スワイプの判定（感度を高める）
+  if (absDeltaX > absDeltaY && absDeltaX >= SWIPE_HORIZONTAL_MIN_DISTANCE) {
     if (deltaX > 0) {
       performPlayerAction('right');
     } else {
       performPlayerAction('left');
     }
-  } else {
+    return;
+  }
+
+  // その他のスワイプ
+  if (Math.max(absDeltaX, absDeltaY) < SWIPE_MIN_DISTANCE) {
+    return;
+  }
+
+  if (absDeltaY > absDeltaX) {
     if (deltaY > 0) {
-      // 下スワイプ - 加速中でなかった場合のみハードドロップ
-      if (!touchState.movedDownDuringTouch && !gameState.isPaused && !gameState.isGameOver) {
+      // 下スワイプ = DROP機能
+      if (!gameState.isPaused && !gameState.isGameOver) {
         hardDrop();
       }
     } else {
@@ -1173,46 +1176,10 @@ function initializeTouchControls() {
       touchState.endX = event.touches[0].clientX;
       touchState.endY = event.touches[0].clientY;
       touchState.touchStartTime = Date.now();
-      touchState.isMovingDown = false;
-      touchState.movedDownDuringTouch = false;
-    }
-  }, { passive: true });
-
-  boardCanvas.addEventListener('touchmove', (event) => {
-    if (event.touches.length === 1) {
-      touchState.endX = event.touches[0].clientX;
-      touchState.endY = event.touches[0].clientY;
-
-      const deltaY = touchState.endY - touchState.startY;
-
-      if (deltaY > 20 && !touchState.isMovingDown) {
-        touchState.isMovingDown = true;
-        touchState.movedDownDuringTouch = true;
-        if (touchState.downMoveTimer) {
-          clearInterval(touchState.downMoveTimer);
-        }
-        touchState.downMoveTimer = setInterval(() => {
-          if (!gameState.isPaused && !gameState.isGameOver) {
-            stepDown();
-          }
-        }, 60);
-      } else if (deltaY <= 20 && touchState.isMovingDown) {
-        touchState.isMovingDown = false;
-        if (touchState.downMoveTimer) {
-          clearInterval(touchState.downMoveTimer);
-          touchState.downMoveTimer = null;
-        }
-      }
     }
   }, { passive: true });
 
   boardCanvas.addEventListener('touchend', (event) => {
-    touchState.isMovingDown = false;
-    if (touchState.downMoveTimer) {
-      clearInterval(touchState.downMoveTimer);
-      touchState.downMoveTimer = null;
-    }
-
     if (event.changedTouches.length === 1) {
       touchState.endX = event.changedTouches[0].clientX;
       touchState.endY = event.changedTouches[0].clientY;
