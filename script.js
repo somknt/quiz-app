@@ -665,6 +665,11 @@ function lockCurrentPieceAndContinue() {
       ? 'none'
       : detectTSpinType(lockedPiece, clearResult.count);
 
+  if (clearResult.count > 0) {
+    // ラインが消えたときに白く光るエフェクト
+    triggerBoardFlash('255, 255, 255', 0.4, 240);
+  }
+
   if (spinType === 'tspin') {
     triggerLineFlash(clearResult.rows, {
       colorRgb: '236, 145, 255',
